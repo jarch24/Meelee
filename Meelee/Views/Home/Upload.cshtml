@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewData["Title"] = "Upload";
+}
+
+<h2>Upload</h2>
+<form asp-action="Upload" asp-controller="Home" enctype="multipart/form-data">
+    <input class="col-md-5" type="file" multiple name="files" />
+    <button class="btn btn-success">Upload</button>
+</form>
+<ul class="list-group">
+    @{
+        if (ViewBag.list != null)
+        {
+            foreach (var item in ViewBag.list)
+            {
+                <li class="list-group-item">
+                    <img src="@item" width="200" height="100" />
+                </li>
+            }
+        }
+
+    }
+</ul>
+
