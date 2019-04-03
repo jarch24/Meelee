@@ -9,11 +9,19 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace Meelee.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IConfiguration _config;
+
+        public HomeController(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -55,7 +63,7 @@ namespace Meelee.Controllers
         [HttpPost]
         public async Task<IActionResult> Upload(List<IFormFile> files)
         {
-            string storageConnectionString = Environment.GetEnvironmentVariable("storageconnectionstring");
+            string storageConnectionString = _config.GetSection("AzureStorage")["Default"];
             CloudStorageAccount conn;
             Response.Redirect("/Home/Upload");
 
