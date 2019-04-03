@@ -10,6 +10,7 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.WindowsAzure.Storage.Table;
 
 namespace Meelee.Controllers
 {
@@ -56,7 +57,7 @@ namespace Meelee.Controllers
         public async Task<IActionResult> Upload()
         {
             var task = GetImagesAsync();
-            task.Wait();
+            //task.Wait();
             return View();
         }
 
@@ -121,11 +122,41 @@ namespace Meelee.Controllers
             {
                 ViewBag.list.Add(item.Uri.ToString());
             }
+            await InsertAsync();
+        }
+
+        public async Task InsertAsync()
+        {
+            try
+            {
+                var connectionString = "DefaultEndpointsProtocol=https;AccountName=tester24;AccountKey=ulJeySdffkNHZWfIb5WTYyuqM6vauhzhnknIPbqNkAqxCu3J3f94WQPujtloniYoZysZby6zC1366OX0WY0AoQ==;TableEndpoint=https://tester24.table.cosmos.azure.com:443/;";
+                CloudStorageAccount storageAccount = CloudStorageAccount.Parse(connectionString);
+                CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+                CloudTable table = tableClient.GetTableReference("Demo");
+                await table.CreateIfNotExistsAsync();
+                TableOperation insert = TableOperation.Insert(new User("Q", "B")
+                {
+                    Phone = "123456789",
+                    Email = "q@p.com"
+                });
+                await table.ExecuteAsync(insert);
+                
+                //TableOperation tb = TableOperation.Retrieve<User>("K", "K");
+                TableQuery<User> query = new TableQuery<User>().Where(
+                        TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "Q"));
 
 
+                var task = table.ExecuteQuerySegmentedAsync<User>(query, null);
+                task.Wait();
+                var user = task.Result;
+            }
+            catch (Exception ex)
+            {
 
-
-
+                throw ex;
+            }
+            
+            
         }
     }
 }
