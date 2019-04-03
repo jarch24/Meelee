@@ -106,7 +106,7 @@ namespace Meelee.Controllers
         public async Task GetImagesAsync()
         {
             ViewBag.list = new List<string>();
-            string storageConnectionString = Environment.GetEnvironmentVariable("storageconnectionstring");
+            string storageConnectionString = _config.GetSection("AzureStorage")["Default"];
 
             CloudStorageAccount storage = CloudStorageAccount.Parse(storageConnectionString);
             CloudBlobClient blob = storage.CreateCloudBlobClient();
